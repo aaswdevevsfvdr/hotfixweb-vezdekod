@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState,useEffect } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import accounting from 'accounting';
 
@@ -8,12 +8,23 @@ import edit from '../img/edit.svg';
 import './place.css';
 
 
+let costil ={
+  faster: true,
+  time: '',
+  selfService: false
+}
+
+
 const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
-  const [ faster, setFaster ] = useState(true);
-  const [ time, setTime ] = useState('');
-  const [ selfService, setSelfService ] = useState(false);
+  const [ faster, setFaster ] = useState(costil.faster);
+  const [ time, setTime ] = useState(costil.time);
+  const [ selfService, setSelfService ] = useState(costil.selfService);
   const area = foodAreas.filter(area => area.id === areaId)[0];
   const item = area.items.filter(item => item.id === itemId)[0];
+
+  useEffect(()=>{
+    console.log('render');
+  },[])
 
   const [ price, products ] = useMemo(() => {
     const foodIds = new Set((item.foods || []).map(item => item.id));
@@ -111,8 +122,13 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
             checked={faster} 
             onToggle={() => {
               if (faster) {
+                costil.faster=false;
                 setFaster(false);
               } else {
+                costil.faster=true;
+                costil.time='';
+
+
                 setTime('');
                 setFaster(true);
               }
@@ -125,14 +141,22 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
           type='time'
             value={time}
             onFocus={() => {
+              costil.faster=false;
+
               setFaster(false);
             }}
             onChange={event => {
+              costil.faster=false;
+              costil.time=event.target.value;
+
+
               setFaster(false);
               setTime(event.target.value);
             }}
             onBlur={() => {
               if (time) {
+                costil.faster=false;
+
                 setFaster(false);
               }
             }}
@@ -140,11 +164,18 @@ const Basket = ({ match: { params: { areaId, itemId }}, foodAreas, order }) => {
         </div>
         <div className="Place__choice-item">
           <h3>С собой</h3>
-          <Checkbox checked={selfService} onToggle={() => setSelfService(!selfService)} />
+          <Checkbox checked={selfService} onToggle={() => {
+          costil.selfService=!selfService
+          setSelfService(!selfService)
+          }
+          
+          } />
         </div>
         <div className="Place__choice-item">
           <h3>На месте</h3>
-          <Checkbox checked={!selfService} onToggle={() => setSelfService(!setSelfService)} />
+          <Checkbox checked={!selfService} onToggle={() => {setSelfService(!setSelfService)
+          costil.selfService=!setSelfService
+          }} />
         </div>
       </div>
       <footer className="Place__footer">
